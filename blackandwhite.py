@@ -1,5 +1,6 @@
 import pygame, sys, random
 from pygame.locals import *
+from numpy import np
 BACKGROUNDCOLOR = (255, 255, 255)
 BLACK = (255, 255, 255)
 BLUE = (0, 0, 255)
@@ -10,6 +11,15 @@ PIECEHEIGHT = 47
 BOARDX = 55
 BOARDY = 55
 FPS = 40
+# alpha_beta减枝
+def alpha_beta(board,alpha,beta,depth):
+    bestValue = -1000000
+    possible = getValidMoves(board,[computerTile])
+    for x,y in possible:
+        copyBoard = getBoardCopy(board)
+        makeMove(copyBoard,computerTile,x,y)
+        if depth <= 1:
+            Value = getEvaluationOfBoard(copyBoard)
 # 退出
 def terminate():
     pygame.quit()
@@ -91,6 +101,19 @@ def getValidMoves(board, tile):
     # return []
     return validMoves
 # 获取棋盘上黑白双方的棋子数
+def getEvaluationOfBoard(board):
+    Vmap = np.array([[500, -25, 10, 5, 5, 10, -25, 500], [-25, -45, 1, 1, 1, 1, -45, -25], [10, 1, 3, 2, 2, 3, 1, 10],
+                     [5, 1, 2, 1, 1, 2, 1, 5], [5, 1, 2, 1, 1, 2, 1, 5], [10, 1, 3, 2, 2, 3, 1, 10],
+                     [-25, -45, 1, 1, 1, 1, -45, -25], [500, -25, 10, 5, 5, 10, -25, 500]])
+    for x in range(8):
+        for y in range(8):
+            if board[x][y] == 'black':
+                xscore += 1
+            if board[x][y] == 'white':
+                oscore += 1
+    return {'black': xscore, 'white': oscore}
+
+
 
 def getScoreOfBoard(board):
     xscore = 0
@@ -199,7 +222,6 @@ def isGameOver(board):
 
 
 # 初始化
-
 pygame.init()
 
 mainClock = pygame.time.Clock()
